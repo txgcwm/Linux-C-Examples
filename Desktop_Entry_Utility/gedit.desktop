@@ -1,0 +1,31 @@
+[Desktop Entry]
+Name=gedit
+GenericName=Text Editor
+Comment=Edit text files
+Exec=gedit %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=accessories-text-editor
+Categories=GNOME;GTK;Utility;TextEditor;
+X-GNOME-DocPath=gedit/gedit.xml
+X-GNOME-FullName=Text Editor
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=gedit
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=3.6.1
+X-GNOME-Bugzilla-ExtraInfoScript=/usr/share/gedit/gedit-bugreport
+Actions=Window;Document;
+Keywords=Text;Plaintext;Write;
+X-Ubuntu-Gettext-Domain=gedit
+
+[Desktop Action Window]
+Name=Open a New Window
+Exec=gedit --new-window
+OnlyShowIn=Unity;
+
+[Desktop Action Document]
+Name=Open a New Document
+Exec=gedit --new-document
+OnlyShowIn=Unity;
