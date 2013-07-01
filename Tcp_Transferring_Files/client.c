@@ -21,6 +21,27 @@ int random_data(void)
     return (rand()%(512) + 512);
 }
 
+ssize_t sendn(int sock_fd, const void *ptr, size_t n, int flags)
+{
+    size_t nleft = n;
+    ssize_t nwritten;
+
+    while(nleft > 0) {
+        if((nwritten = send(sock_fd, ptr, nleft, flags)) < 0) {
+            if(nleft == n)
+                return -1;
+            else
+                break;
+        } else if(nwritten == 0) 
+            break;
+
+        nleft -= nwritten;
+        ptr += nwritten;
+    }
+
+    return (n - nleft);
+}
+
 int main(int argc, char **argv)
 {
     int s;
@@ -28,6 +49,7 @@ int main(int argc, char **argv)
     char buffer[BUFFER_SIZE];
 	int fd = -1;
 	ssize_t size = 0;
+	ssize_t nsendsize = 0;
 
 	fd = open("video_cmmb.h264",O_RDONLY); 
 	if(fd < 0) {
@@ -37,7 +59,7 @@ int main(int argc, char **argv)
 
     if((s = socket(AF_INET,SOCK_STREAM,0)) < 0) {
         perror("socket");
-        exit(1);
+       	return -1;
     }
   
     bzero(&addr,sizeof(addr));
@@ -47,7 +69,7 @@ int main(int argc, char **argv)
  
     if(connect(s,(struct sockaddr *)&addr,sizeof(addr))<0) {
         perror("connect");
-        exit(1);
+		return -1;
     }
   
     recv(s,buffer,sizeof(buffer),0);
@@ -60,10 +82,14 @@ int main(int argc, char **argv)
 		if(size <= 0)
 			break;
 
-        if(send(s, buffer, size, 0) < 0) {
-            perror("send");
-            exit(1);
-        }
+        if((nsendsize = sendn(s, buffer, size, 0)) < 0) {
+		    perror("sendn error!\n");
+		    lseek(fd, -size, SEEK_CUR);
+		    return -1;
+		}
+
+		if(nsendsize < size)
+		    lseek(fd, nsendsize - size, SEEK_CUR);
 
 		usleep(1000);
     }
