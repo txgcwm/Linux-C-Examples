@@ -1,0 +1,12 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libinifile
+Description: Library for parsing ini-style configuration files (C API).
+URL: http://www.algonet.se/~lespaul/proj/libinifile
+Version: 0.5.5
+Requires: 
+Libs: -L${libdir} -linifile
+Cflags:

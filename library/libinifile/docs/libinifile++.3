@@ -1,0 +1,137 @@
+.TH LIBINIFILE\+\+ 3 "17 January 2008" "QNET" "Linux Programmer's Manual" 
+.\"
+.\"     Copyright (c) 2008 Anders Lövgren
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"
+.SH NAME
+libinifile\+\+ \- C\+\+ library for parsing ini-style configuration files.
+.SH SYNOPSIS
+.B #include <inifile++.hpp>
+.SH DESCRIPTION
+libinifile\+\+ is a small library that provides a pure C\+\+ parser for parsing 
+ini-style configuration files. The parser is validating and throws an
+parser::exception object whenever it encounters a syntax error in the input stream
+(the opened ini-file). The parser is declared in the namespace inifilepp.
+.SH SUMMARY
+.RS
+.nf
+//
+// Structure for an entry parsed from the ini-file:
+//
+\fBstruct parser::entry\fP
+{
+        unsigned int line;      // line number.
+        char *sect;             // section name.
+        char *key;              // entry keyword.
+        char *val;              // entry value.
+};
+
+//
+// The exception object thrown:
+//   
+\fBstruct parser::exception\fP
+{
+        unsigned int line;
+        unsigned int pos;
+        std::string msg;
+};		
+.TP
+\fBparser::parser\fI(const char *path);\fP
+Contructor of the parser object. The path argument is the ini-file to parse. 
+Throws parser::exception on initilize error.
+.TP
+\fBparser::~parser\fI();\fP
+Destructor of the parser object.
+.TP
+\fBconst parser::entry * parser::next\fI() const;\fP
+Get next entry from input stream (the ini-file). Throws parser::exception on
+syntax or memory allocation error.
+.TP
+\fBvoid parser::getopt\fI(int option, int &value);\fP
+.TP
+\fBvoid parser::getopt\fI(int option, char **value);\fP
+.TP
+\fBvoid parser::setopt\fI(int option, int value);\fP
+.TP
+\fBvoid parser::setopt\fI(int option, const char *value);\fP
+Get or set the value for an parser option. See OPTIONS for descriptions about
+the option argument. Throws an parser::exception on failure.
+.SH OPTIONS
+Possible values for the option argument to parser::setopt() and
+parser::getopt() with its value type inside parenthesis:
+.TP 
+\fBINIFPP_CHECK_SYNTAX\fP (int)
+Controls whether syntax check should be done at all.
+.TP 
+\fBINIFPP_ALLOW_QUOTE\fP (int)
+Allow quoted strings around value.
+.TP 
+\fBINIFPP_ASSIGN_INSIDE\fP (int)
+Allow assign characters inside value.
+.TP
+\fBINIFPP_ALLOW_MULTILINE\fP (int)
+Allow value to span multiple lines using '\\' as line continuation character.
+.TP
+\fBINIFPP_COMPACT_MLINE\fP (int)
+Eat extra whitespace in value when INIFPP_ALLOW_MULTILINE is used.
+.TP
+\fBINIFILE_CHARS_COMMENT\fP (char *)
+Controls the set of characters identified as begin of comment (default: '#').
+.TP
+\fBINIFILE_CHARS_ASSIGN\fP (char *)
+Controls the set of characters identified as assignment chars (default: '=').
+.SH EXAMPLE
+A small example showing how to parse an ini-file:
+.RS
+.nf
+
+#include <iostream>
+#include <fstream>
+#include <inifile++.hpp>
+
+using namespace inifilepp;
+
+int main(int argc, char **argv)
+{
+	try {
+		parser p("sample.conf");
+		const parser::entry *ent;
+		
+		while((ent = p.next())) {
+			std::cout << "sect='" << (ent->sect ? ent->sect : "") << "', " 
+				  << "key='"  << (ent->key  ? ent->key  : "") << "', " 
+				  << "val='"  << (ent->val  ? ent->val  : "") << "'\\n";
+		}
+	} catch(parser::exception &e) {
+		std::cerr << "parse error at (" << e.line << "," << e.cpos << ")\\n";
+		return 1;
+	}
+	
+	return 0;
+}
+.RE
+.fi
+.SH BUGS
+Probably.
+.SH AUTHOR
+Anders Lövgren <lespaul@algonet.se>
+.SH COPYRIGHT
+Copyright (c) 2008 Anders Lövgren
+.PP
+Distributed under the GNU General Public License.
+.SH SEE ALSO
+.BR libinifile (3)

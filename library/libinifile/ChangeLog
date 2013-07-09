@@ -1,0 +1,62 @@
+0.5.5 (2010-06-02):
+
+      * Updated build system to work with autoconf 2.63.
+      
+0.5.4 (2008-10-21):
+0.5.3 (2008-06-23):
+0.5.3 (2008-06-23):
+0.5.1 (2008-06-23):
+      
+      * Many small fixes, no new features. Most fixes are in the build
+        system and the documentation (manual pages).
+      
+0.5.0 (2008-01-23):
+
+      * Fixed the C++ library to use libinifile code (C library) for parsing.
+        Updated the C++ interface (header). 
+	
+      * Adding manual page for the C++ library (libinifile++) and fixing the 
+        manual page for the C library (libinifile).
+      
+0.4.1 (2008-01-22):
+
+      * Adding pkg-config interface for other packages to link against this
+        library.
+
+      * Support for values spanning over multiple lines (multiline). This
+        feature can be enabled/disabled by calling inifile_set_option().
+
+0.4.0 (2008-01-21):
+
+      * Modified API inifile_xxx_option() to allow caller to change the set
+        of characters to treat as comment start and assignment characters.
+	
+0.3.0 (2008-01-21):
+      
+      * Added inifile_set_option()/inifile_get_option() to configure parser
+        options. Currently its possible to enable/disable:
+	o) syntax check.
+	o) quoted strings check.
+	o) assignment inside value.
+
+      * Fixed API documentation of libinifile. Adding man section 3 pages
+        for inifile_set_option(), inifile_get_option(), inifile_get_error() and
+	inifile_clear_error().
+	
+0.2.1 (2008-01-20):
+
+      * Fixed conditional building C and C++ test depending on --enable-test
+        and --enable-cxx.
+	
+      * Added better error detection in lexer and parser. Improved error
+        messages to be more fine grained.
+	
+0.2.0 (2008-01-16):
+
+      * Added C-source version of the library. The library was written in
+        C++ originally. The C++ version of the library is in directory cxx 
+	and is conditionally built by configure the source with --enable-cxx
+	and installed as libinifile++ (both shared and static by default).
+      
+      * Added manual pages for the C-library version of libinifile.
+      

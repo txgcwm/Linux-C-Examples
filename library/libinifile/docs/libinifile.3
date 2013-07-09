@@ -1,0 +1,159 @@
+.TH LIBINIFILE 3 "17 January 2008" "QNET" "Linux Programmer's Manual" 
+.\"
+.\"     Copyright (c) 2008 Anders Lövgren
+.\"
+.\"     This program is free software; you can redistribute it and/or modify
+.\"     it under the terms of the GNU General Public License as published by
+.\"     the Free Software Foundation; either version 2 of the License, or
+.\"     (at your option) any later version.
+.\"
+.\"     This program is distributed in the hope that it will be useful,
+.\"     but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"     GNU General Public License for more details.
+.\"
+.\"     You should have received a copy of the GNU General Public License
+.\"     along with this program; if not, write to the Free Software
+.\"     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+.\"
+.\"
+.SH NAME
+libinifile \- C library for parsing ini-style configuration files.
+.SH SYNOPSIS
+.B #include <inifile.h>
+.SH DESCRIPTION
+libinifile is a small library for parsing ini-style configuration files,
+that is, configuration files with keyword \= value entries optionally organized
+under sections with section header. For example Samba and MySQL is using
+this format for their configuration files. 
+.PP
+The library implements and validating parser where syntax check is done 
+in parallell with the parsing. Use inifile_get_error() to differentiate
+between end of file condition and a parse error. Each parser has its own
+error object. Parser option can be set by calling \fBinifile_set_option()\fP.
+.PP
+The library is initilized by calling \fBinifile_init()\fP. Call
+\fBinifile_free()\fP to release allocated memory when done parsing. Using the
+inifile structure after inifile_free() has been called leads to undefined behavour. The
+inifile structure can be reused by calling inifile_init() again after
+calling inifile_free() first.
+.SH SUMMARY
+.RS
+.nf
+/* 
+ * Structure for an entry parsed from the ini-file:
+ */
+\fBstruct inient\fP
+{
+        unsigned int line;      /* line number. */
+        char *sect;             /* section name. */
+        char *key;              /* entry keyword. */
+        char *val;              /* entry value. */
+};
+
+/*
+ * The parse error structure returned by inifile_get_error():
+ */   
+\fBstruct inierr\fP
+{
+        unsigned int line;
+        unsigned int pos;
+        char *msg;
+};			  
+.TP
+\fBint inifile_init\fI(struct inifile *, const char *conf);\fP
+Initialise library, return 0 if successful and -1 on error. The conf
+argument is the name of the ini-file to parse.
+.TP
+\fBconst struct inient * inifile_parse\fI(struct inifile *);\fP
+Parse and return a pointer to the next entry from the ini-file. Returns NULL
+on end of file condition or if a parse error happens. Use
+inifile_get_error() to check if error.
+.TP
+\fBvoid inifile_free\fI(struct inifile *);\fP
+Release memory allocated and close the ini-file.
+.TP
+\fBvoid inifile_set_option\fI(struct inifile *, int option, const void *value);\fP
+Set parser option, see OPTIONS section for more information.
+.TP
+\fBint inifile_get_option\fI(struct inifile *, int option, void *value);\fP
+Get parser option, see OPTIONS section for more information.
+.TP
+\fBconst struct inierr * inifile_get_error\fI(struct inifile *);\fP
+Get last error or NULL if no error occured.
+.TP
+\fBvoid inifile_clear_error\fI(struct inifile *);\fP
+Clear last error object.
+.SH OPTIONS
+Possible values for the option argument to inifile_set_option() and
+inifile_get_option() along with the in/out value type inside parentheses:
+.TP 
+\fBINIFILE_CHECK_SYNTAX\fP (in: int *, out: int *)
+Controls whether syntax check should be done at all.
+.TP 
+\fBINIFILE_ALLOW_QUOTE\fP (in: int *, out: int *)
+Allow quoted strings around value.
+.TP 
+\fBINIFILE_ASSIGN_INSIDE\fP (in: int *, out: int *)
+Allow assign characters inside value.
+.TP
+\fBINIFPP_ALLOW_MULTILINE\fP (in: int *, out: int *)
+Allow value to span multiple lines using '\\' as line continuation character.
+.TP
+\fBINIFPP_COMPACT_MLINE\fP (in: int *, out: int *)
+Eat extra whitespace in value when INIFPP_ALLOW_MULTILINE is used.
+.TP
+\fBINIFILE_CHARS_COMMENT\fP (in: char *, out: char **)
+Controls the set of characters identified as begin of comment (default: '#').
+.TP
+\fBINIFILE_CHARS_ASSIGN\fP (in: char *, out: char **)
+Controls the set of characters identified as assignment chars (default: '=').
+.SH EXAMPLE
+A small example showing how to parse an ini-file:
+.RS
+.nf
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <inifile.h>
+
+static void die(struct inifile *inf)
+{
+	const struct inierr *error = inifile_get_error(inf);
+        fprintf(stderr, "%s(%d:%d): %s\\n", 
+	        inf->file, error->line, error->pos, error->msg);
+	exit(1);
+}
+
+int main(int argc, char **argv)
+{
+	struct inifile inf;
+	const struct inient *ent;
+	
+	if(inifile_init(&inf, "sample.conf") == 0) {
+		while((ent = inifile_parse(&inf))) {
+			printf("sect=%s, key=%s, val=%s\\n", 
+			        ent->sect, ent->key, ent->val);
+		}
+		if(inifile_get_error(&inf)) {
+			die(&inf);
+		} 
+	} else {
+		die(&inf);
+	}
+	
+	inifile_free(&inf);
+	return 0;
+}
+.RE
+.fi
+.SH BUGS
+Probably.
+.SH AUTHOR
+Anders Lövgren <lespaul@algonet.se>
+.SH COPYRIGHT
+Copyright (c) 2008 Anders Lövgren
+.PP
+Distributed under the GNU General Public License.
+.SH SEE ALSO
+.BR libinifile++ (3)
