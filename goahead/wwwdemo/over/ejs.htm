@@ -1,0 +1,23 @@
+<HTML>
+<HEAD>
+<!-- Copyright (c) Go Ahead Software Inc., 1995-2010. All Rights Reserved. -->
+<TITLE>JavaScript -- GoAhead WebServer </TITLE>
+<link rel="stylesheet" href="../style/normal_ws.css"></HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<TABLE WIDTH="539" BORDER="00000" HEIGHT="75"><TR><TD><H1>Embedded JavaScript</H1><P>GoAhead provides an embedded version of JavaScript with WebServer called Ejscript&trade;.&nbsp; As the full JavaScript 1.2 specification is now quite a large language, its size prohibits its use in most embedded devices. GoAhead's embedded JavaScript is designed to solve this dilemma. Ejscript&trade; is a strict subset of JavaScript and implements the essential elements of the language. Ejscript also interfaces with Active Server Pages (ASP) to allow the easy creation of dynamic Web pages. </P>
+<p>A standalone product, <a href="http://www.ejscript.org" target=_new>Embedthis EJScript&trade;</a> more fully supports the latest JavaScript 3 specification and is an alternative to the built-in WebServer support.</p>
+<P>When JavaScript is used inside an ASP Web page, it consists of a script within ASP delimiters. The basic format is: </P><PRE> &lt;% function(arguments, ...); %&gt;</PRE><P>JavaScript functions are created by the <A HREF="../docs/techref/jsapi/ejSetGlobalFunction.htm">ejSetGlobalFunction</A>. When the function is evaluated, the corresponding C procedure that implements the JavaScript function is called. </P><P>Ejscript implements the following JavaScript elements: </P>
+<UL>
+<LI>Case sensitivity </LI><LI>White space </LI><LI>Semicolons </LI><LI>Comments </LI><LI>Identifiers </LI><LI>Data types including numbers, booleans, and strings with backslash characters </LI><LI>Full expressions </LI><LI>If/else, for, return </LI><LI>Global function calls </LI></UL><P>The following language elements are not implemented:</P><UL>
+<LI>Arrays </LI><LI>Objects </LI><LI>Labeled statements </LI><LI>Control flow statements including: break, case, continue, default, do/while, export, for/in, function, import, switch, var, while, and with </LI><LI>Regular expressions </LI></UL><P>JavaScript scripts can span multiple lines by using  "\" as the last character on the preceding line. When used in ASP pages, function arguments can contain any query variable defined  in either   the URL query string or   the <A HREF="../docs/techref/wsapi/websVar.htm">standard variable set</A>.&nbsp; URL query strings are automatically decoded,  and JavaScript variables are defined to the decoded query value. For example, to parse the name and address encoded as a query string in a URL, use the following code: </P><PRE>
+http://localhost/mypage?name=smith&amp;age=35
+
+int myAspProcedure(webs_t wp, int argc, char_t **argv) {
+&#9;char_t *name = websGetVar(wp, "name", "undefined");
+&#9;char_t *age = websGetVar(wp, "age", "undefined");
+    websWrite(wp, "Name %s, Age", args);
+}</PRE><P>JavaScript procedures are registered by using the <A HREF="../docs/techref/wsapi/websAspDefine.htm">websAspDefine</A> API. This publishes a C procedure as a JavaScript global function. For example:</P><PRE>extern int outputMyTable(int ejid, webs_t wp, int argc, char_t **argv);
+     websAspDefine("outputTable", outputMyTable);</PRE><P>The websAspDefine call publishes the JavaScript command "outputTable" and links it to the outputMyTable C procedure. When an ASP page is requested by the user's browser, any ASP JavaScript which uses the <I>outputTable c</I>ommand will cause the <I>outputMyTable</I> to be called with the relevant arguments. </P><H2>See Also</H2><P><A HREF="asp.htm">Active Server Pages</A>, <A HREF="goforms.htm">GoForms</A>&trade; </P></TD></TR></TABLE>
+</BODY>
+</HTML>

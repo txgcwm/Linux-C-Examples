@@ -1,0 +1,95 @@
+<html>
+<head>
+<!-- Copyright (c) PeerSec Networks, Inc., 2002-2010. All Rights Reserved. -->
+<title>MatrixSSL Documentation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="../style/normal_ws.css">
+</head>
+
+<body bgcolor="#FFFFFF" style="margin:3px;">
+<a href="http://www.peersec.com" target=_new><img src="/graphics/peerseclogo.gif" border=0 style="float:right;margin-right:20px;"></a>
+
+<h1>MatrixSSL Documentation</h1>
+MatrixSSL is a small footprint SSL implementation for which WebServer now includes a supported layer.  SSL provides support for "https://" requests. 
+MatrixSSL can be downloaded from PeerSec Networks and has its own build procedure described in the PDF document below.
+<p>
+Accessing web pages through https does not by default authenticate the user requesting the page, but it does encrypt the data to and from the server so that it cannot be intercepted and decoded by someone else. 
+For example, when logging into a webmail system, the URL will begin with "https://", but the user must still type their username and password into the form and submit it to get access to the mailbox.
+<p>
+To authenticate users with WebServer, <a href="/over/digestauth.htm">Digest Authentication</a>, <a href="/over/usermanagement.htm">User Management</a>, or a custom login form (using CGI, ASP or GoForms for processing) may be used to provide enterprise-level security to your device.
+
+<h2>Access</h2>
+To access pages encrypted by the SSL protocol, run the SSL-enabled Web server, and enter a uRL such as below into a browser:
+<a href="https://localhost:4433">https://localhost:4433</a>
+<p>
+Browsers such as Internet Explorer and Safari will present a warning about unsigned certificates and allow you to continue loading the page.
+Some browsers, such as Firefox 3.0 and later, will return an error message indicating that the certificate is not trusted, eg:
+<pre>Alert
+
+localhost:4433 uses an invalid security certificate.
+
+The certificate is not trusted because the issuer certificate is unknown.
+The certificate is only valid for <a id="cert_domain_link" title="Sample Server Cert">Sample Server Cert</a>
+
+(Error code: sec_error_unknown_issuer)</pre>
+
+This error message is given because the sample certificate provided with the WebServer distribution is self-signed. 
+This means that a certificate authority, such as Verisign or GoDaddy, did not sign it, and you are not able to trust that the site is what it claims to be. 
+Of course, in this case you are running a server on your local network, so it is okay to add an exception for this certificate in your browser.
+The exception should be removed once you have generated or obtained your own certificate and private key for the server.
+<p>
+In Firefox, you can provide an exception for the site while testing under:<br/>
+<pre>
+Preferences-&gt;Advanced-&gt;Encryption-&gt;View Certificates-&gt;Servers-&gt;Add Exception
+</pre>
+The dialog will ask for the host URL, which in this example is "https://localhost:4433".
+Enter the name of your host and port, and click "Get Certificate". 
+The certificate is loaded and you have the option to have an exception for this cert on this host. 
+Click Ok, and you will be able to access the Web server via https.
+<p>
+Increasingly, browsers are making it more difficult to accept certificates that are self signed, or where the hostname in the certificate doesn't match the host name you are accessing.  This is good for security but does require the extra measures described above when testing with sample certificates.
+<h2>Configuration</h2>
+MatrixSSL is enabled by default in WebServer via the WebServer make file definining "WEBS_SSL_SUPPORT". To disable support for SSL, the Makefile can be modified not to define this definition.
+When defined, MatrixSSL must be built before WebServer, so that WebServer can link to the MatrixSSL static library.
+<p>
+The public key certificate and private key file used by WebServer is defined in "websSSL.h", as DEFAULT_CERT_FILE and DEFAULT_KEY_FILE.
+<b>Make sure these two files are not located in a directory accessible through the Web server!</b>
+<p>
+<b>Also, the files included are not secure (as the private key is well known) - a new key and certificate should be created for production use</b>.
+<p>
+The port for defined for HTTPS is standardized at '443'. Initially, WebServer HTTPS port is defined as 4433 to avoid conflict with any existing service.  This can be changed in "webs.h" by changing the definition of WEBS_DEFAULT_SSL_PORT.
+<p>
+Additional Configuration for the MatrixSSL library itself is described in the MatrixSSL Developers guide, below.
+
+<h2>APIs</h2>
+With MatrixSSL enabled, all pages below the websDefaultDir are accessible by BOTH http and https URLs.  This means that by default, although pages can be accessed securely, they can also be accessed insecurely.
+To specify that certain directories may ONLY be accessed if https is used (and the connection is encrypted), use the 'websRequireSSL() API.
+The example below shows the calls that must be made before and after websRequireSSL. In addition, this example shows the usage of websSSLOpen() and websSSLClose(), which take no parameters, but are required to be called after the server is opened and before the server is closed, respectively.  These APIs initialize and free the SSL module.
+
+<pre>
+#include "websSSL.h"
+...
+	websSetDefaultDir("/Users/peersec/www/");
+...
+	websOpenServer(80, 5);
+...
+	websSSLOpen();
+	websRequireSSL("/secure/"); /* Any URL under /secure/ must use https */
+	websRequireSSL("/cgi-bin/"); /* Secure CGI script input and output */
+	websRequireSSL("/goform/"); /* Secure all goforms */
+...
+	websSSLClose();
+...
+	websCloseServer();
+</pre>
+
+<h2>MatrixSSL Documentation</h2>
+<ul>
+<li><a href="../Webs25MatrixSSL.pdf">MatrixSSL Webserver Integration</a> (PDF)</li>
+</ul>
+
+<H2>See Also</H2>
+<A HREF="/over/digestauth.htm">Digest Authentication</A>,
+<A HREF="/over/whitelist.htm">Whitelist URL Validation</A>
+</body>
+</html>

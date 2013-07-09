@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Whitelist URL Filtering -- GoAhead WebServer</title>
+<link rel="stylesheet" href="../style/normal_ws.css">
+</head>
+
+<body style="margin:3px;">
+
+<H1>GoAhead WebServer Whitelist</H1>
+<P>GoAhead WebServer 2.5 adds an in-memory, whitelist-based URL validator that greatly improves the security of file access through the Web. 
+The whitelist is automatically built internally by the Web server based on a recursive directory traversal within the 'websDefaultDir'. 
+</p><p>
+Only files meeting certain criteria are added to the whitelist, with special attention paid to files that are within the '/cgi-bin/' directory.
+URLs that have been marked as SSL access only via the 'websRequireSSL' API are also flagged, requiring the request to be via HTTPS in order for them to be accessed.
+</p><p>
+When a URL request is made to WebServer, the URL is validated against the URLs in the whitelist, and if there is no direct, non-interpreted string match, the URL is rejected with an HTTP 404 error. 
+This prevents operating system-specific lookup tricks, such as embedding "../" in the URL for accessing files outside the intended Web directory.
+</p><p>
+The whitelist is updated dynamically and will automatically be updated when a file is either added or removed from the 'websDefaultDir'.
+If the whitelist check succeeds, additional operating system-specific checks are done, for file permission, executablility, etc.
+</P><P>
+No special APIs are required to enable or configure the whitelist.  The whitelist may be disabled by undefining WEBS_WHITELIST_SUPPORT in "webs.h", although this is not recommended for security reasons.
+</P><H2>See Also</H2>
+<A HREF="/matrixssl/matrixssl.htm">MatrixSSL</A>
+</body>
+</html>
