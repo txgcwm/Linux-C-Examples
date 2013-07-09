@@ -1,0 +1,4 @@
+.DS_Store
+*.o
+h264
+all_tests

@@ -1,0 +1,11 @@
+H264Dec
+========
+This programs connects to a RTSP server and record
+in a file the H264 incoming stream.
+
+Known Bugs:
+-----------
+RTCP support is partially broken and not well defined,
+so some servers can complain about the stats and close
+the connections.
+

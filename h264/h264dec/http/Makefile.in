@@ -1,0 +1,14 @@
+CC      = gcc -g -Wall -DDEBUG
+INCDIR  = ../../src -I../../../../src/include/ -I../../
+OBJECTS = main.o network.o
+
+all: h264streamer.duda
+
+h264streamer.duda: $(OBJECTS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFS) -shared -o $@ $^ -lc
+
+.c.o:
+	$(CC) $(CFLAGS) $(LDFLAGS) $(DEFS) -I$(INCDIR) -fPIC -c $<
+
+clean:
+	rm -rf *.o *~ *.*duda*
